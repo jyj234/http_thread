@@ -1,0 +1,103 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <link rel="stylesheet" href="https://a.amap.com/jsapi_demos/static/demo-center/css/demo-center.css" />
+
+    <title>glTF 模型</title>
+    <style>
+        html,
+        body,
+        #container {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .cc {
+            position: absolute;
+            color: #000000;
+            bottom: 10px;
+            left: 10px;
+        }
+    </style>
+    <script>
+        delete window.AMap;
+    </script>
+</head>
+
+<body onLoad="mapInit()">
+    <div id="container"></div>
+    <div class="cc">shanghai city 3D models by Michael Zhang /
+        <a target='_blank' href="http://creativecommons.org/licenses/by/2.0/">CC BY </a>
+    </div>
+    <script src="http://webapi.amap.com/maps?v=1.4.15&key=222a351e11027a435c82b136824fe5e7&plugin=Map3D"></script>
+    <script src="http://a.amap.com/jsapi_demos/static/demo-center/js/demoutils.js"></script>
+
+    <script>
+        function mapInit() {
+            // 创建地图实例
+            var map = new AMap.Map("container", {
+                viewMode: '3D',
+                pitch: 80,
+                rotation: 25,
+                expandZoomRange: true,
+                zoom: 18,
+                zooms: [17, 20],
+                center: [118.094553, 24.579936],
+                showBuildingBlock: false,
+                mapStyle: 'amap://styles/macaron',
+                showIndoorMap: false
+            });
+
+            // 创建Object3DLayer图层
+            var object3Dlayer = new AMap.Object3DLayer();
+            map.add(object3Dlayer);
+
+            var druckMeshes, cityMeshes,zsMeshes;
+
+
+            map.plugin(["AMap.GltfLoader"], function () {
+                // // var urlCity = './test/1.gltf';
+                // var urlDuck = 'https://a.amap.com/jsapi_demos/static/gltf/Duck.gltf';
+                var urlDuck = './test/1.gltf';
+
+                var paramDuck = {
+                    position: new AMap.LngLat(118.093287, 24.577795), // 必须
+                    scale: 1, // 非必须，默认1
+                    height: 0,  // 非必须，默认0
+                    scene: 0, // 非必须，默认0
+                };
+
+      
+                // var urlDuck = 'https://a.amap.com/jsapi_demos/static/gltf/Duck.gltf';
+
+                // var paramDuck = {
+                //     position: new AMap.LngLat(118.094312, 24.581458), // 必须
+                //     scale: 800, // 非必须，默认1
+                //     height: -100,  // 非必须，默认0
+                //     scene: 0, // 非必须，默认0
+                // };
+		    
+
+                var gltfObj = new AMap.GltfLoader();
+
+                gltfObj.load(urlDuck, function (gltfDuck) {
+                    druckMeshes = gltfDuck;
+                    gltfDuck.setOption(paramDuck);
+                    gltfDuck.rotateX(90);
+                    // gltfDuck.rotateZ(-20);
+                    object3Dlayer.add(gltfDuck);
+                });
+
+            });
+
+        }
+    </script>
+</body>
+
+</html>
