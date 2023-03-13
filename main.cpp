@@ -44,7 +44,7 @@ void show_error( int connfd, const char* info )
 
 int main( int argc, char* argv[] )
 {
-    if( argc <= 1 )
+    if( argc <2 )
     {
 	PRINT_INTPUT_ERROR;
         return 1;
@@ -63,7 +63,6 @@ int main( int argc, char* argv[] )
 
 	}
     int port = atoi( argv[parse_n] );
-
     addsig( SIGPIPE, SIG_IGN );
 
     threadpool< http_conn >* pool = NULL;
@@ -78,7 +77,7 @@ int main( int argc, char* argv[] )
 
     http_conn* users = new http_conn[ MAX_FD ];
     assert( users );
-    int user_count = 0;
+
     int listenfd = socket( PF_INET, SOCK_STREAM, 0 );
     assert( listenfd >= 0 );
     struct linger tmp = { 1, 0 };
@@ -92,7 +91,8 @@ int main( int argc, char* argv[] )
     address.sin_port = htons( port );
 
     ret = bind( listenfd, ( struct sockaddr* )&address, sizeof( address ) );
-    assert( ret == 0 );
+    assert( ret >= 0 );
+
     ret = listen( listenfd, 5 );
     assert( ret >= 0 );
 
@@ -165,3 +165,4 @@ int main( int argc, char* argv[] )
     delete pool;
     return 0;
 }
+

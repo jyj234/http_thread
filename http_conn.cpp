@@ -326,9 +326,9 @@ http_conn::HTTP_CODE http_conn::do_request()
     strcpy( m_real_file, doc_root );
     int len = strlen( doc_root );
     strncpy( m_real_file + len, m_url, FILENAME_LEN - len - 1 );
-    int len_url=strlen(m_url);
-    strncpy(m_real_file+len+len_url,"index.html",FILENAME_LEN-len-len_url-1);
-    //printf("%s\n",m_real_file);
+    //int len_url=strlen(m_url);
+    //strncpy(m_real_file+len+len_url,"index.html",FILENAME_LEN-len-len_url-1);
+    printf("%s\n",m_real_file);
     if ( stat( m_real_file, &m_file_stat ) < 0 )
     {
 	printf("resource not exist\n");
