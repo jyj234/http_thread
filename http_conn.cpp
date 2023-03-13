@@ -185,6 +185,8 @@ http_conn::HTTP_CODE http_conn::parse_request_line( char* text )
         return BAD_REQUEST;
     }
     *m_version++ = '\0';
+    if(!strcmp(m_version-4,".js"))
+	    file_type="js";
     m_version += strspn( m_version, " \t" );
     if ( strcasecmp( m_version, "HTTP/1.1" ) != 0 )
     {
@@ -243,10 +245,6 @@ http_conn::HTTP_CODE http_conn::parse_headers( char* text )
         text += 5;
         text += strspn( text, " \t" );
         m_host = text;
-    }
-    else
-    {
-        printf( "oop! unknow header %s\n", text );
     }
 
     return NO_REQUEST;
@@ -327,8 +325,8 @@ http_conn::HTTP_CODE http_conn::do_request()
     int len = strlen( doc_root );
     strncpy( m_real_file + len, m_url, FILENAME_LEN - len - 1 );
     //int len_url=strlen(m_url);
-    //strncpy(m_real_file+len+len_url,"index.html",FILENAME_LEN-len-len_url-1);
-    printf("%s\n",m_real_file);
+   // strncpy(m_real_file+len+len_url,"index.html",FILENAME_LEN-len-len_url-1);
+    printf("file address: %s\n",m_real_file);
     if ( stat( m_real_file, &m_file_stat ) < 0 )
     {
 	printf("resource not exist\n");
@@ -433,6 +431,7 @@ void http_conn::add_headers( int content_len )
 {
     add_content_length( content_len );
     add_linger();
+    add_content_type();
     add_blank_line();
 }
 
@@ -454,6 +453,16 @@ bool http_conn::add_blank_line()
 bool http_conn::add_content( const char* content )
 {
     return add_response( "%s", content );
+}
+bool http_conn::add_content_type(){
+	std::string type;
+	if(file_type=="js")
+		type="application/javascript";
+	else 
+		type="*/*";
+	return add_response("Content-Type: %s\r\n",type.c_str());
+
+
 }
 
 bool http_conn::process_write( HTTP_CODE ret )

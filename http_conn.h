@@ -20,6 +20,7 @@
 #include <errno.h>
 #include<sys/uio.h>
 #include<semaphore.h>
+#include<string>
 #include "locker.h"
 
 class http_conn
@@ -64,6 +65,7 @@ private:
     bool add_content_length( int content_length );
     bool add_linger();
     bool add_blank_line();
+    bool add_content_type();
 
 public:
     static int m_epollfd;
@@ -94,6 +96,8 @@ private:
     struct stat m_file_stat;
     struct iovec m_iv[2];
     int m_iv_count;
+
+    std::string file_type;
 };
 
 #endif
