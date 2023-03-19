@@ -21,6 +21,10 @@
 extern int addfd( int epollfd, int fd, bool one_shot );
 extern int removefd( int epollfd, int fd );
 
+
+static int m_pipefd[2];
+void sig_del_inactive_connection(int sig){
+}
 void addsig( int sig, void( handler )(int), bool restart = true )
 {
     struct sigaction sa;
@@ -90,7 +94,7 @@ int main( int argc, char* argv[] )
     address.sin_addr.s_addr = htonl(INADDR_ANY);
     address.sin_port = htons( port );
 
-    ret = bind( listenfd, ( struct sockaddr* )&address, sizeof( address ) );
+    ret =bind( listenfd, ( struct sockaddr* )&address, sizeof( address ) );
     assert( ret >= 0 );
 
     ret = listen( listenfd, 5 );
@@ -99,6 +103,10 @@ int main( int argc, char* argv[] )
     epoll_event events[ MAX_EVENT_NUMBER ];
     int epollfd = epoll_create( 5 );
     assert( epollfd != -1 );
+    /*ret = socketpair( PF_UNIX, SOCK_STREAM, 0, sig_pipefd );
+    assert( ret != -1 );
+    setnonblocking( sig_pipefd[1] );
+    addfd( epollfd, sig_pipefd[0] );*/
     addfd( epollfd, listenfd, false );
     http_conn::m_epollfd = epollfd;
 
@@ -129,12 +137,13 @@ int main( int argc, char* argv[] )
                     show_error( connfd, "Internal server busy" );
                     continue;
                 }
-                
+               printf("user_count=%d\n",http_conn::m_user_count); 
                 users[connfd].init( connfd, client_address );
             }
             else if( events[i].events & ( EPOLLRDHUP | EPOLLHUP | EPOLLERR ) )
             {
                 users[sockfd].close_conn();
+		printf("close\n");
             }
             else if( events[i].events & EPOLLIN )
             {
@@ -145,6 +154,7 @@ int main( int argc, char* argv[] )
                 else
                 {
                     users[sockfd].close_conn();
+		    printf("read error\n");
                 }
             }
             else if( events[i].events & EPOLLOUT )
@@ -152,6 +162,7 @@ int main( int argc, char* argv[] )
                 if( !users[sockfd].write() )
                 {
                     users[sockfd].close_conn();
+		    printf("write error\n");
                 }
             }
             else

@@ -32,7 +32,7 @@
 
 <body onLoad="mapInit()">
     <div id="container"></div>
-    <div class="cc">shanghai city 3D models by Michael Zhang /
+    <div class="cc">Jmu 3D models by Jinyj /
         <a target='_blank' href="http://creativecommons.org/licenses/by/2.0/">CC BY </a>
     </div>
     <script src="http://webapi.amap.com/maps?v=1.4.15&key=222a351e11027a435c82b136824fe5e7&plugin=Map3D"></script>
@@ -73,17 +73,7 @@
                     scene: 0, // 非必须，默认0
                 };
 
-      
-                // var urlDuck = 'https://a.amap.com/jsapi_demos/static/gltf/Duck.gltf';
-
-                // var paramDuck = {
-                //     position: new AMap.LngLat(118.094312, 24.581458), // 必须
-                //     scale: 800, // 非必须，默认1
-                //     height: -100,  // 非必须，默认0
-                //     scene: 0, // 非必须，默认0
-                // };
-		    
-
+    
                 var gltfObj = new AMap.GltfLoader();
 
                 gltfObj.load(urlDuck, function (gltfDuck) {
@@ -94,8 +84,8 @@
                     object3Dlayer.add(gltfDuck);
                 });
 
-            });
 
+            });
         }
     </script>
 </body>

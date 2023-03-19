@@ -1,0 +1,3 @@
+Digital_School.html为模型放入网页的直接演示
+index.html是利用高德地图API引入模型
+由于要访问文件，而edge浏览器有安全限制，要用live server等方式打开

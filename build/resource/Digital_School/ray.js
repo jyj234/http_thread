@@ -46,7 +46,6 @@ export function ray(event) {
                                for(let i=0;i<=10;++i){
                         scene.children[0].children[77].children[i].material.emissive.setHex( 0xff0000 );
                              }
-                             cube
 						INTERSECTED = intersects[ 0 ].object.parent;
                         console.log(INTERSECTED);
                         scene.add(cube);

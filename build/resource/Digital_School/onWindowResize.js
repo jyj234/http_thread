@@ -1,5 +1,6 @@
 import {camera} from './camera.js'
-export {renderer} from './renderer.js'
+import {WebGLRenderer} from './js/three.module.js'
+let renderer = new WebGLRenderer({ antialias: true });
 
 export function onWindowResize() {
 

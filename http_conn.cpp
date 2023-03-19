@@ -187,6 +187,8 @@ http_conn::HTTP_CODE http_conn::parse_request_line( char* text )
     *m_version++ = '\0';
     if(!strcmp(m_version-4,".js"))
 	    file_type="js";
+    else 
+	    file_type="other";
     m_version += strspn( m_version, " \t" );
     if ( strcasecmp( m_version, "HTTP/1.1" ) != 0 )
     {
@@ -273,7 +275,7 @@ http_conn::HTTP_CODE http_conn::process_read()
     {
         text = get_line();
         m_start_line = m_checked_idx;
-        printf( "got 1 http line: %s\n", text );
+        //printf( "got 1 http line: %s\n", text );
 
         switch ( m_check_state )
         {
@@ -373,6 +375,7 @@ bool http_conn::write()
     while( 1 )
     {
         temp = writev( m_sockfd, m_iv, m_iv_count );
+	//printf("writing\n");
         if ( temp <= -1 )
         {
             if( errno == EAGAIN )
