@@ -22,6 +22,7 @@
 #include<semaphore.h>
 #include<string>
 #include "locker.h"
+#include "time_heap.h"
 
 class http_conn
 {
@@ -70,6 +71,7 @@ private:
 public:
     static int m_epollfd;
     static int m_user_count;
+    static time_heap* m_time_heap;
 
 private:
     int m_sockfd;

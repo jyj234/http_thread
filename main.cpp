@@ -13,6 +13,7 @@
 #include "locker.h"
 #include "threadpool.h"
 #include "http_conn.h"
+#include "time_heap.h"
 
 #define MAX_FD 65536
 #define MAX_EVENT_NUMBER 10000
@@ -20,10 +21,15 @@
 
 extern int addfd( int epollfd, int fd, bool one_shot );
 extern int removefd( int epollfd, int fd );
+extern int setnonblocking(int fd);
+static int sig_pipefd[2];
 
-
-static int m_pipefd[2];
+time_heap* http_conn::m_time_heap=new time_heap(MAX_FD);
 void sig_del_inactive_connection(int sig){
+	int save_errno = errno;
+    	int msg = sig;
+    	send( sig_pipefd[1], ( char* )&msg, 1, 0 );
+    	errno = save_errno;
 }
 void addsig( int sig, void( handler )(int), bool restart = true )
 {
@@ -45,7 +51,10 @@ void show_error( int connfd, const char* info )
     close( connfd );
 }
 
-
+void del_connection(){
+	http_conn::m_time_heap->tick();
+	alarm(TIMESLOT);
+}
 int main( int argc, char* argv[] )
 {
     if( argc <2 )
@@ -67,7 +76,7 @@ int main( int argc, char* argv[] )
 
 	}
     int port = atoi( argv[parse_n] );
-    addsig( SIGPIPE, SIG_IGN );
+   // addsig( SIGPIPE, SIG_IGN );
 
     threadpool< http_conn >* pool = NULL;
     try
@@ -103,13 +112,18 @@ int main( int argc, char* argv[] )
     epoll_event events[ MAX_EVENT_NUMBER ];
     int epollfd = epoll_create( 5 );
     assert( epollfd != -1 );
-    /*ret = socketpair( PF_UNIX, SOCK_STREAM, 0, sig_pipefd );
+    ret = socketpair( PF_UNIX, SOCK_STREAM, 0, sig_pipefd );
     assert( ret != -1 );
     setnonblocking( sig_pipefd[1] );
-    addfd( epollfd, sig_pipefd[0] );*/
+    addfd( epollfd, sig_pipefd[0],false );
     addfd( epollfd, listenfd, false );
     http_conn::m_epollfd = epollfd;
+	addsig(SIGALRM,sig_del_inactive_connection,false);
+    bool timeout=false;
+    alarm(TIMESLOT);
 
+   // int http_conn::tmp=1;
+   // printf("%d\n",http_conn::tmp);
     while( true )
     {
         int number = epoll_wait( epollfd, events, MAX_EVENT_NUMBER, -1 );
@@ -137,9 +151,14 @@ int main( int argc, char* argv[] )
                     show_error( connfd, "Internal server busy" );
                     continue;
                 }
-               printf("user_count=%d\n",http_conn::m_user_count); 
+               //printf("user_count=%d\n",http_conn::m_user_count); 
                 users[connfd].init( connfd, client_address );
+
             }
+	    else if (( sockfd == sig_pipefd[0] ) && ( events[i].events & EPOLLIN )){
+		timeout=true;
+
+	    }
             else if( events[i].events & ( EPOLLRDHUP | EPOLLHUP | EPOLLERR ) )
             {
                 users[sockfd].close_conn();
@@ -166,8 +185,13 @@ int main( int argc, char* argv[] )
                 }
             }
             else
-            {}
+	    {}
         }
+	if(timeout){
+		printf("timeslot\n");
+		del_connection();
+		timeout=false;
+	}
     }
 
     close( epollfd );

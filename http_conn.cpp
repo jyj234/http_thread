@@ -1,5 +1,6 @@
 #include "http_conn.h"
-
+#include "time_heap.h"
+#define TIMESLOT 5
 const char* ok_200_title = "OK";
 const char* error_400_title = "Bad Request";
 const char* error_400_form = "Your request has bad syntax or is inherently impossible to satisfy.\n";
@@ -49,6 +50,12 @@ void modfd( int epollfd, int fd, int ev )
 int http_conn::m_user_count = 0;
 int http_conn::m_epollfd = -1;
 
+void cb_func(int sockfd){
+
+	epoll_ctl(http_conn::m_epollfd,EPOLL_CTL_DEL,sockfd,0);
+	close(sockfd);
+	printf("close %d for timeout\n",sockfd);
+}
 void http_conn::close_conn( bool real_close )
 {
     if( real_close && ( m_sockfd != -1 ) )
@@ -71,8 +78,12 @@ void http_conn::init( int sockfd, const sockaddr_in& addr )
     setsockopt( m_sockfd, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof( reuse ) );
     addfd( m_epollfd, sockfd, true );
     m_user_count++;
-
     init();
+
+    heap_timer* timer=new heap_timer(3*TIMESLOT);
+    timer->sockfd=sockfd;
+    timer->cb_func=cb_func;
+    m_time_heap->add_timer(timer);
 }
 
 void http_conn::init()

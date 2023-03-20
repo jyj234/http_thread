@@ -4,10 +4,9 @@
 #include <iostream>
 #include <netinet/in.h>
 #include <time.h>
-using std::exception;
 
 #define BUFFER_SIZE 64
-
+#define TIMESLOT 5
 class heap_timer;
 struct client_data
 {
@@ -27,38 +26,39 @@ public:
 
 public:
    time_t expire;
-   void (*cb_func)( client_data* );
-   client_data* user_data;
+  void (*cb_func)(int );
+  // client_data* user_data;
+  int sockfd;
 };
 
 class time_heap
 {
 public:
-    time_heap( int cap ) throw ( std::exception )
+    time_heap( int cap ) noexcept
         : capacity( cap ), cur_size( 0 )
     {
 	array = new heap_timer* [capacity];
-	if ( ! array )
+	/*if ( ! array )
 	{
             throw std::exception();
-	}
+	}*/
         for( int i = 0; i < capacity; ++i )
         {
             array[i] = NULL;
         }
     }
-    time_heap( heap_timer** init_array, int size, int capacity ) throw ( std::exception )
-        : cur_size( size ), capacity( capacity )
+    time_heap( heap_timer** init_array, int size, int capacity ) noexcept
+        : capacity(capacity),cur_size( size )
     {
-        if ( capacity < size )
+        /*if ( capacity < size )
         {
             throw std::exception();
-        }
+        }*/
         array = new heap_timer* [capacity];
-        if ( ! array )
+        /*if ( ! array )
         {
             throw std::exception();
-        }
+        }*/
         for( int i = 0; i < capacity; ++i )
         {
             array[i] = NULL;
@@ -85,7 +85,7 @@ public:
     }
 
 public:
-    void add_timer( heap_timer* timer ) throw ( std::exception )
+    void add_timer( heap_timer* timer ) noexcept
     {
         if( !timer )
         {
@@ -154,7 +154,7 @@ public:
             }
             if( array[0]->cb_func )
             {
-                array[0]->cb_func( array[0]->user_data );
+                array[0]->cb_func(array[0]->sockfd );
             }
             pop_timer();
             tmp = array[0];
@@ -185,17 +185,17 @@ private:
         }
         array[hole] = temp;
     }
-    void resize() throw ( std::exception )
+    void resize() noexcept
     {
         heap_timer** temp = new heap_timer* [2*capacity];
         for( int i = 0; i < 2*capacity; ++i )
         {
             temp[i] = NULL;
         }
-        if ( ! temp )
+        /*if ( ! temp )
         {
             throw std::exception();
-        }
+        }*/
         capacity = 2*capacity;
         for ( int i = 0; i < cur_size; ++i )
         {
