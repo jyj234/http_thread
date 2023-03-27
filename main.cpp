@@ -78,7 +78,8 @@ int main( int argc, char* argv[] )
     int port = atoi( argv[parse_n] );
    // addsig( SIGPIPE, SIG_IGN );
 
-    threadpool< http_conn >* pool = NULL;
+    threadpool< http_conn >* pool=threadpool<http_conn>::getpool();
+    
     try
     {
         pool = new threadpool< http_conn >(thread_number);
@@ -188,7 +189,7 @@ int main( int argc, char* argv[] )
 	    {}
         }
 	if(timeout){
-		printf("timeslot\n");
+	//	printf("timeslot\n");
 		del_connection();
 		timeout=false;
 	}

@@ -72,6 +72,7 @@ public:
     static int m_epollfd;
     static int m_user_count;
     static time_heap* m_time_heap;
+    static int tmp;
 
 private:
     int m_sockfd;

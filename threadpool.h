@@ -14,6 +14,7 @@ public:
     threadpool( int thread_number = 8, int max_requests = 10000 );
     ~threadpool();
     bool append( T* request );
+    static threadpool* getpool();
 
 private:
     static void* worker( void* arg );
@@ -27,7 +28,11 @@ private:
     locker m_queuelocker;
     sem m_queuestat;
     bool m_stop;
+
+    static threadpool* instance;
 };
+template<typename T>
+threadpool<T>* threadpool<T>::instance=NULL;
 
 template< typename T >
 threadpool< T >::threadpool( int thread_number, int max_requests ) : 
@@ -64,6 +69,7 @@ template< typename T >
 threadpool< T >::~threadpool()
 {
     delete [] m_threads;
+    delete instance;
     m_stop = true;
 }
 
@@ -113,5 +119,12 @@ void threadpool< T >::run()
     }
 }
 
+template<typename T>
+threadpool<T>* threadpool< T >::getpool(){
+    if(instance==NULL){
+        instance=new threadpool;
+    }
+    return instance;
+}
 #endif
 

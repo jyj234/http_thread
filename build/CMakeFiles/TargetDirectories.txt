@@ -1,3 +1,3 @@
-/home/jinyj/project/http_thread/build/CMakeFiles/http_thread.dir
-/home/jinyj/project/http_thread/build/CMakeFiles/edit_cache.dir
 /home/jinyj/project/http_thread/build/CMakeFiles/rebuild_cache.dir
+/home/jinyj/project/http_thread/build/CMakeFiles/edit_cache.dir
+/home/jinyj/project/http_thread/build/CMakeFiles/http_thread.dir

@@ -1,6 +1,7 @@
 #include "http_conn.h"
 #include "time_heap.h"
 #define TIMESLOT 5
+#define CLOSETIME 60
 const char* ok_200_title = "OK";
 const char* error_400_title = "Bad Request";
 const char* error_400_form = "Your request has bad syntax or is inherently impossible to satisfy.\n";
@@ -80,7 +81,8 @@ void http_conn::init( int sockfd, const sockaddr_in& addr )
     m_user_count++;
     init();
 
-    heap_timer* timer=new heap_timer(3*TIMESLOT);
+    int n=CLOSETIME/TIMESLOT;
+    heap_timer* timer=new heap_timer(n*TIMESLOT);
     timer->sockfd=sockfd;
     timer->cb_func=cb_func;
     m_time_heap->add_timer(timer);
