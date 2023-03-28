@@ -57,16 +57,14 @@ void del_connection(){
 }
 int main( int argc, char* argv[] )
 {
-    if( argc <2 )
-    {
-	PRINT_INTPUT_ERROR;
-        return 1;
-    }
     int parse_n=1;
+    int port=80;
     int thread_number=8;
-	while(argv[parse_n][0]=='-'){
+	while(parse_n<argc&&argv[parse_n][0]=='-'){
 		switch (argv[parse_n][1]){
 			case 't':thread_number=atoi(argv[++parse_n]);
+				 break;
+			case 'p':port=atoi(argv[++parse_n]);
 				 break;
 			default:
 				PRINT_INTPUT_ERROR;
@@ -75,7 +73,7 @@ int main( int argc, char* argv[] )
 		parse_n++;
 
 	}
-    int port = atoi( argv[parse_n] );
+   // int port = atoi( argv[parse_n] );
    // addsig( SIGPIPE, SIG_IGN );
     	threadpool< http_conn >* pool=threadpool<http_conn>::getpool(thread_number);
 
