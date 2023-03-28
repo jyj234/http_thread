@@ -77,17 +77,7 @@ int main( int argc, char* argv[] )
 	}
     int port = atoi( argv[parse_n] );
    // addsig( SIGPIPE, SIG_IGN );
-
-    threadpool< http_conn >* pool=threadpool<http_conn>::getpool();
-    
-    try
-    {
-        pool = new threadpool< http_conn >(thread_number);
-    }
-    catch( ... )
-    {
-        return 1;
-    }
+    	threadpool< http_conn >* pool=threadpool<http_conn>::getpool(thread_number);
 
     http_conn* users = new http_conn[ MAX_FD ];
     assert( users );

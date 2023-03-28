@@ -14,7 +14,7 @@ public:
     threadpool( int thread_number = 8, int max_requests = 10000 );
     ~threadpool();
     bool append( T* request );
-    static threadpool* getpool();
+    static threadpool* getpool(int thread_number);
 
 private:
     static void* worker( void* arg );
@@ -120,9 +120,9 @@ void threadpool< T >::run()
 }
 
 template<typename T>
-threadpool<T>* threadpool< T >::getpool(){
+threadpool<T>* threadpool< T >::getpool(int thread_number){
     if(instance==NULL){
-        instance=new threadpool;
+        instance=new threadpool(thread_number);
     }
     return instance;
 }
