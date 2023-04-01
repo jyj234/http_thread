@@ -33,6 +33,8 @@ public:
 
 class time_heap
 {
+private:
+	static time_heap* instance;
 public:
     time_heap( int cap ) noexcept
         : capacity( cap ), cur_size( 0 )
@@ -75,6 +77,12 @@ public:
             }
         }
     }
+    static time_heap* get_heap(int max_fd=10000){
+	    if(instance==NULL){
+	    	instance=new time_heap(max_fd);
+	    }
+	    return instance;
+    }
     ~time_heap()
     {
         for ( int i =  0; i < cur_size; ++i )
@@ -83,6 +91,7 @@ public:
         }
         delete [] array; 
     }
+
 
 public:
     void add_timer( heap_timer* timer ) noexcept

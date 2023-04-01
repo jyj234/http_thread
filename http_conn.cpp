@@ -85,7 +85,7 @@ void http_conn::init( int sockfd, const sockaddr_in& addr )
     heap_timer* timer=new heap_timer(n*TIMESLOT);
     timer->sockfd=sockfd;
     timer->cb_func=cb_func;
-    m_time_heap->add_timer(timer);
+    time_heap::get_heap()->add_timer(timer);
 }
 
 void http_conn::init()
@@ -182,9 +182,11 @@ http_conn::HTTP_CODE http_conn::parse_request_line( char* text )
     *m_url++ = '\0';
 
     char* method = text;
-    if ( strcasecmp( method, "GET" ) == 0 )
-    {
+    if ( strcasecmp( method, "GET" ) == 0 ){
         m_method = GET;
+    }
+    else if(strcasecmp(method,"POST")==0){
+    	m_method=POST;
     }
     else
     {
@@ -288,7 +290,7 @@ http_conn::HTTP_CODE http_conn::process_read()
     {
         text = get_line();
         m_start_line = m_checked_idx;
-        //printf( "got 1 http line: %s\n", text );
+        printf( "got 1 http line: %s\n", text );
 
         switch ( m_check_state )
         {

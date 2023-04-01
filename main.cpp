@@ -17,14 +17,15 @@
 
 #define MAX_FD 65536
 #define MAX_EVENT_NUMBER 10000
-#define PRINT_INTPUT_ERROR printf( "usage: %s [-t thread_number] port_number\n", basename( argv[0] ) )
+#define PRINT_INTPUT_ERROR printf( "usage: %s [-t thread_number] [-p port_number]\n", basename( argv[0] ) )
 
 extern int addfd( int epollfd, int fd, bool one_shot );
 extern int removefd( int epollfd, int fd );
 extern int setnonblocking(int fd);
 static int sig_pipefd[2];
 
-time_heap* http_conn::m_time_heap=new time_heap(MAX_FD);
+time_heap* time_heap::instance=NULL;
+time_heap* http_conn::m_time_heap=time_heap::get_heap(MAX_FD);
 void sig_del_inactive_connection(int sig){
 	int save_errno = errno;
     	int msg = sig;
@@ -52,7 +53,7 @@ void show_error( int connfd, const char* info )
 }
 
 void del_connection(){
-	http_conn::m_time_heap->tick();
+	time_heap::get_heap()->tick();
 	alarm(TIMESLOT);
 }
 int main( int argc, char* argv[] )
@@ -76,7 +77,6 @@ int main( int argc, char* argv[] )
    // int port = atoi( argv[parse_n] );
    // addsig( SIGPIPE, SIG_IGN );
     	threadpool< http_conn >* pool=threadpool<http_conn>::getpool(thread_number);
-
     http_conn* users = new http_conn[ MAX_FD ];
     assert( users );
 
