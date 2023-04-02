@@ -3,6 +3,7 @@ cd ./build
 make clean
 cmake ../
 make
+
 while  [  -e "./build/http_thread" ];do 
 	echo "waiting\n"
 done

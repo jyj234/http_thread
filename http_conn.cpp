@@ -1,5 +1,7 @@
 #include "http_conn.h"
 #include "time_heap.h"
+ #include "userdata.h"
+#include "MysqlDB.h"
 #define TIMESLOT 5
 #define CLOSETIME 60
 const char* ok_200_title = "OK";
@@ -12,7 +14,7 @@ const char* error_404_form = "The requested file was not found on this server.\n
 const char* error_500_title = "Internal Error";
 const char* error_500_form = "There was an unusual problem serving the requested file.\n";
 const char* doc_root = "build/resource";
-
+const std::string table="userdata";
 int setnonblocking( int fd )
 {
     int old_option = fcntl( fd, F_GETFL );
@@ -270,12 +272,29 @@ http_conn::HTTP_CODE http_conn::parse_headers( char* text )
 
 http_conn::HTTP_CODE http_conn::parse_content( char* text )
 {
+	std::cout<<"parse_content"<<std::endl;
     if ( m_read_idx >= ( m_content_length + m_checked_idx ) )
     {
         text[ m_content_length ] = '\0';
+	std::cout<<text<<std::endl;
+	char* id,*email,*password;
+	id=strpbrk(text,"=");
+	email=strpbrk(++id,"&");
+	*email++='\0';
+	email=strpbrk(email,"=");
+	password=strpbrk(++email,"&");
+	*password++='\0';
+	password=strpbrk(password,"=");
+	password++;
+	MysqlDB<userdata>* db=MysqlDB<userdata>::getMysqlDB();
+//	db->add(table,id,email,password);
+	userdata u(id,email,password);
+	
+	db->add(table,u);
+//	u.print_data();
         return GET_REQUEST;
     }
-
+    std::cout<<"not"<<std::endl;
     return NO_REQUEST;
 }
 

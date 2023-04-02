@@ -14,6 +14,8 @@
 #include "threadpool.h"
 #include "http_conn.h"
 #include "time_heap.h"
+#include "MysqlDB.h"
+#include "userdata.h"
 
 #define MAX_FD 65536
 #define MAX_EVENT_NUMBER 10000
@@ -24,6 +26,7 @@ extern int removefd( int epollfd, int fd );
 extern int setnonblocking(int fd);
 static int sig_pipefd[2];
 
+//MysqlDB<userdata>* MysqlDB<userdata>::instance=NULL;
 time_heap* time_heap::instance=NULL;
 time_heap* http_conn::m_time_heap=time_heap::get_heap(MAX_FD);
 void sig_del_inactive_connection(int sig){
@@ -111,6 +114,8 @@ int main( int argc, char* argv[] )
     bool timeout=false;
     alarm(TIMESLOT);
 
+    MysqlDB<userdata>* db=MysqlDB<userdata>::getMysqlDB();
+    db->connect( "localhost", "root", "root@123", "user" ); 
    // int http_conn::tmp=1;
    // printf("%d\n",http_conn::tmp);
     while( true )
